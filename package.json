@@ -1,0 +1,19 @@
+{
+  "name": "backend-filesistem-thesis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.0",
+    "express-fileupload": "^1.1.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.10",
+    "uuid": "^3.3.2"
+  }
+}
