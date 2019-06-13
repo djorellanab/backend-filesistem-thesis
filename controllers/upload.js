@@ -1,8 +1,7 @@
 'use strict'
-
 const {HttpError} = require('../resources/error');
-const {FunctionalMovement} = require('../schemas/functional-movement');
-const {File} = require('../schemas/file');
+const FunctionalMovement = require('../schemas/functional-movement');
+const File = require('../schemas/file');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
 const path = require('path');
@@ -10,9 +9,8 @@ const extensionesValidations = ['gbd'];
 module.exports = {
     post: (req, res, next) =>{
         if(!req.files){return next (HttpError.BadRequest); }
-        
         let data = req.files.file;
-        let id = req.files.id;
+        let id = req.body.id;
         let guid = uuidv1();
 
         let name = data.name.split('.');
@@ -44,19 +42,25 @@ module.exports = {
                     }
                     return next (HttpError.BadRequest);
                 }
-                FunctionalMovement.findByIdAndUpdate(id, {file:fileDB._id}, {new: true}, (err, fmDB) =>{
+                FunctionalMovement.findByIdAndUpdate(id, {file:fileDB._id}, (err, fmDB) =>{
                     if (err){
-                        File.findByIdAndUpdate(fileDB._id, {state: false}, {new: true}, (err, fileDB2) =>{
+                        File.remove({ _id: fileDB._id }, (err) =>{
+                            if(path.existsSync(absolutePath)){
+                                fs.unlinkSync(absolutePath);
+                            }
                             return next (HttpError.BadRequest);
                         });
                     } else if (data === null){
-                        File.findByIdAndUpdate(fileDB._id, {state: false}, {new: true}, (err, fileDB2) =>{
+                        File.remove({ _id: fileDB._id }, (err) =>{
+                            if(path.existsSync(absolutePath)){
+                                fs.unlinkSync(absolutePath);
+                            }
                             return next (HttpError.NotFound);
                         });
                     }
                     res.json({
                         status: "success",
-                        message: "Se ha cargado el archivo"
+                        idFile: fileDB._id
                     });
                 });
             })
@@ -66,7 +70,8 @@ module.exports = {
         let id = req.params.id;
         File.findById(id)
         .exec((err, data) =>{
-            if(err) {return next (HttpError.BadRequest);}
+            if(err) {
+                return next (HttpError.BadRequest);}
             else if (data === null){return next (HttpError.NotFound);}
             let absolutePath = path.resolve(__dirname,`../${data.path}/${data.guid}.${data.extension}`);
             let _file = fs.createReadStream(absolutePath);
@@ -74,7 +79,8 @@ module.exports = {
             res.setHeader('Content-Length', stat.size);
             res.setHeader('Content-Type', 'application/octet-stream');
             res.setHeader('Content-Disposition', `attachment; filename=${data.name}.${data.extension}`);
+            res.setHeader('Cache-Control', `no-cache, no-store, must-revalidate`);
             _file.pipe(res);
-        })
+        });
     }
 }

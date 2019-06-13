@@ -4,6 +4,6 @@ const {verificarToken} = require('../../../middleware/authentication');
 var uploadController = require('../../../controllers/upload');
 
 api.post('/',[verificarToken], uploadController.post);
-api.post('/:id',[verificarToken], uploadController.get);
+api.get('/:id',[verificarToken], uploadController.get);
 
 module.exports = api;
