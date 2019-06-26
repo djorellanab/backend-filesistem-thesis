@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: restfs-contr
+  labels:
+    app: thesis
+    role: backend
+    tier: filesistem
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: thesis
+        role: backend
+        tier: filesistem
+    spec:
+      containers:
+      - name: thesis-rest-filesistem
+        image: djob195/thesis-rest-filesistem
+        volumeMounts:
+        - name: upload-filesistem
+          mountPath: /usr/src/app/uploads
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+        - name: PORT
+          value: ""
+        - name: DBTYPE
+          value: ""
+        - name: USERDB
+          value: ""
+        - name: PASSWORDDB
+          value: ""
+        - name: PATHDB
+          value: ""
+        - name: PORTDB
+          value: ""
+        - name: NAMEDB
+          value: ""
+        - name: DBTYPE
+          value: ""
+        - name: CADUCIDAD_TOKEN
+          value: ""
+        - name: SEED
+          value: ""
+        - name: ADMINUSER
+          value: ""
+        - name: ADMINPASSWORD
+          value: ""
+        - name: DESDE
+          value: ""
+        - name: LIMITE
+          value: ""
+        ports:
+        - containerPort: 8080
+      volumes:
+      - name: upload-filesistem
+        emptyDir: {}

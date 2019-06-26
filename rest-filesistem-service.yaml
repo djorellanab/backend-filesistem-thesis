@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: restfs-service
+  labels:
+    app: thesis
+    role: backend
+    tier: filesistem
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: thesis
+    role: backend
+    tier: filesistem
